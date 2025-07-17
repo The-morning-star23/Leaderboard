@@ -10,7 +10,7 @@ function ClaimHistory({ refresh }) {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const res = await api.get("/claims/history");
+        const res = await api.get("/claim/history");
         setHistory(res.data);
       } catch (err) {
         console.error("Failed to fetch claim history:", err);
