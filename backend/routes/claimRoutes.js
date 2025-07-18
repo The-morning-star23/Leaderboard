@@ -40,9 +40,12 @@ router.get('/history', async (req, res) => {
       .sort({ createdAt: -1 });
 
     const formatted = logs.map(log => ({
-      user: log.user.name,
+      _id: log._id, // required as React key
+      user: {
+        name: log.user?.name || 'Unknown', // safe access with optional chaining
+      },
       points: log.points,
-      timestamp: log.createdAt,
+      createdAt: log.createdAt, // properly named for frontend
     }));
 
     res.json(formatted);
