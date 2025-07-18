@@ -9,6 +9,7 @@ import AddUserForm from "./components/AddUserForm";
 import ClaimHistory from "./components/ClaimHistory";
 import Top3Podium from "./components/Top3Podium";
 import EditUserModal from "./components/EditUserModal";
+import FloatingGiftIcon from "./components/FloatingGiftIcon";
 
 function App() {
   const [users, setUsers] = useState([]);
