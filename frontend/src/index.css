@@ -1,3 +1,51 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Sparkles */
+.sparkle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  background: white;
+  border-radius: 50%;
+  opacity: 0.6;
+  animation: sparkle-float 5s infinite ease-in-out;
+}
+
+/* Ribbons */
+.ribbon {
+  position: absolute;
+  width: 20px;
+  height: 80px;
+  background: linear-gradient(135deg, #fcd34d, #fbbf24);
+  border-radius: 10px;
+  opacity: 0.4;
+  animation: ribbon-float 12s infinite linear;
+}
+
+/* Sparkle Animation */
+@keyframes sparkle-float {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateY(-10px) scale(1.4);
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 0.8;
+  }
+}
+
+/* Ribbon Animation */
+@keyframes ribbon-float {
+  0% {
+    transform: translateY(100vh) rotate(0deg);
+  }
+  100% {
+    transform: translateY(-100vh) rotate(360deg);
+  }
+}

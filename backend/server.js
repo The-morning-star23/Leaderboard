@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const path = require("path");
 
 const connectDB = require('./config/db');
 
@@ -26,6 +27,8 @@ app.use('/api/claim', claimRoutes);
 app.get('/', (req, res) => {
   res.send('Leaderboard API is running...');
 });
+
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server started on port ${PORT}`));

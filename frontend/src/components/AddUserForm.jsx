@@ -1,50 +1,81 @@
-// Form to add a new user to the leaderboard
-import PropTypes from "prop-types";
 import { useState } from "react";
+import PropTypes from "prop-types";
 import api from "../api";
-import { toast } from "react-hot-toast";
+import toast from "react-hot-toast";
 
 function AddUserForm({ onSuccess }) {
   const [name, setName] = useState("");
+  const [avatarFile, setAvatarFile] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const handleAddUser = async () => {
+  const handleAddUser = async (e) => {
+    e.preventDefault();
+
     if (!name.trim()) {
-      toast.error("Enter a name first.");
+      toast.error("Name is required");
       return;
+    }
+
+    const formData = new FormData();
+    formData.append("name", name);
+    if (avatarFile) {
+      formData.append("avatar", avatarFile);
     }
 
     setLoading(true);
     try {
-      await api.post("/users", { name });
+      await api.post("/users", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      toast.success("User added!");
       setName("");
-      toast.success("User added successfully!");
-      onSuccess(); // Refresh user list in parent
+      setAvatarFile(null);
+      onSuccess();
     } catch (err) {
-      console.error("Error adding user:", err);
-      toast.error(err.response?.data?.message || "Failed to add user.");
+      console.error(err);
+      toast.error("Failed to add user");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <form
+      onSubmit={handleAddUser}
+      className="flex flex-col sm:flex-row items-center gap-2"
+    >
       <input
         type="text"
+        placeholder="Enter name"
         value={name}
-        placeholder="Add new user"
         onChange={(e) => setName(e.target.value)}
-        className="p-2 border rounded w-full sm:w-52"
+        className="p-2 border rounded w-full sm:w-auto"
       />
+      <input
+        type="file"
+        accept="image/png, image/jpeg, image/jpg"
+        onChange={(e) => setAvatarFile(e.target.files[0])}
+        className="text-sm"
+      />
+      {avatarFile && (
+        <div className="mt-2">
+          <img
+            src={URL.createObjectURL(avatarFile)}
+            alt="Avatar Preview"
+            className="w-16 h-16 rounded-full object-cover border"
+          />
+        </div>
+      )}
       <button
-        onClick={handleAddUser}
+        type="submit"
         disabled={loading}
-        className="bg-green-600 text-white px-3 py-2 rounded hover:bg-green-700 transition disabled:opacity-50"
+        className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded disabled:opacity-50"
       >
-        {loading ? "Adding..." : "➕ Add"}
+        {loading ? "Adding..." : "Add User"}
       </button>
-    </div>
+    </form>
   );
 }
 
