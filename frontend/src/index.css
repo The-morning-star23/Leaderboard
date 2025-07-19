@@ -2,7 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Sparkles */
+/* --------------------- */
+/* Sparkles Decoration   */
+/* --------------------- */
 .sparkle {
   position: absolute;
   width: 6px;
@@ -11,20 +13,9 @@
   border-radius: 50%;
   opacity: 0.6;
   animation: sparkle-float 5s infinite ease-in-out;
+  filter: drop-shadow(0 0 2px white);
 }
 
-/* Ribbons */
-.ribbon {
-  position: absolute;
-  width: 20px;
-  height: 80px;
-  background: linear-gradient(135deg, #fcd34d, #fbbf24);
-  border-radius: 10px;
-  opacity: 0.4;
-  animation: ribbon-float 12s infinite linear;
-}
-
-/* Sparkle Animation */
 @keyframes sparkle-float {
   0% {
     transform: translateY(0) scale(1);
@@ -32,7 +23,7 @@
   }
   50% {
     transform: translateY(-10px) scale(1.4);
-    opacity: 0.5;
+    opacity: 0.4;
   }
   100% {
     transform: translateY(0) scale(1);
@@ -40,24 +31,38 @@
   }
 }
 
-/* Updated background stripes */
-.bg-stripes {
-  background-image: repeating-linear-gradient(
-    45deg,
-    rgba(255, 255, 240, 0.2) 0px,
-    rgba(255, 255, 240, 0.2) 12px,
-    transparent 12px,
-    transparent 24px
-  );
-  background-color: #fff8dc; /* light golden canvas behind stripes */
+/* --------------------- */
+/* Floating Ribbons      */
+/* --------------------- */
+.ribbon {
+  position: absolute;
+  width: 24px;
+  height: 100px;
+  border-radius: 12px;
+  opacity: 0.35;
+  filter: blur(1.5px);
+  animation: ribbon-float 14s infinite linear;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
 }
 
-/* Ribbon Animation */
 @keyframes ribbon-float {
   0% {
     transform: translateY(100vh) rotate(0deg);
   }
   100% {
-    transform: translateY(-100vh) rotate(360deg);
+    transform: translateY(-120vh) rotate(360deg);
   }
+}
+
+/* --------------------- */
+/* Background Stripes    */
+/* --------------------- */
+.bg-stripes {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(255, 255, 255, 0.08) 0,
+    rgba(255, 255, 255, 0.08) 10px,
+    transparent 10px,
+    transparent 20px
+  );
 }
