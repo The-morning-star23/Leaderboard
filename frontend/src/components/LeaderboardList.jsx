@@ -37,124 +37,112 @@ function LeaderboardList({ refresh, selectedUserId, variant, setLeaderboardData,
     })
     .slice(0, topN === "all" ? leaderboard.length : Number(topN));
 
-  const baseStyles = {
-    hourly: "bg-[#FFD700] text-black", // Gold background
-    live: "bg-gradient-to-r from-yellow-400 to-yellow-300 text-black",
-    wealth: "bg-gradient-to-r from-amber-200 to-yellow-100 text-black",
-    default: "bg-white text-black",
-  };
-
   return (
     <MotionDiv
       layout
-      className={`p-4 rounded shadow max-w-2xl mx-auto relative overflow-hidden ${
-        baseStyles[variant] || baseStyles.default
+      className={`p-4 rounded-2xl shadow-xl max-w-2xl mx-auto transition-all duration-300 ${
+        variant === "hourly"
+          ? "bg-yellow-50 text-black"
+          : variant === "live"
+          ? "bg-gradient-to-r from-yellow-400 to-yellow-300 text-black"
+          : variant === "wealth"
+          ? "bg-yellow-50 text-black"
+          : "bg-white text-black"
       }`}
     >
-      {/* Floating stripe background only for hourly */}
-      {variant === "hourly" && (
-        <div className="absolute inset-0 bg-stripes pointer-events-none z-0" />
-      )}
+      <h2 className="text-xl font-bold mb-4 text-center text-yellow-800 drop-shadow">
+        {variant.charAt(0).toUpperCase() + variant.slice(1)} Ranking
+      </h2>
 
-      <div className="relative z-10">
-        <h2 className="text-xl font-bold mb-4 text-center text-black drop-shadow">
-          {variant.charAt(0).toUpperCase() + variant.slice(1)} Ranking
-        </h2>
+      {/* Time Filter */}
+      <div className="flex justify-center gap-4 mb-4">
+        <button
+          onClick={() => setTimeFilter("daily")}
+          className={`px-3 py-1 rounded-full font-semibold transition ${
+            timeFilter === "daily" ? "bg-blue-600 text-white" : "bg-white text-blue-600 border"
+          }`}
+        >
+          Daily
+        </button>
+        <button
+          onClick={() => setTimeFilter("monthly")}
+          className={`px-3 py-1 rounded-full font-semibold transition ${
+            timeFilter === "monthly" ? "bg-blue-600 text-white" : "bg-white text-blue-600 border"
+          }`}
+        >
+          Monthly
+        </button>
+      </div>
 
-        {/* Time Filter */}
-        <div className="flex justify-center gap-4 mb-4">
-          <button
-            onClick={() => setTimeFilter("daily")}
-            className={`px-3 py-1 rounded-full font-semibold transition ${
-              timeFilter === "daily"
-                ? "bg-blue-600 text-white"
-                : "bg-white text-blue-600 border"
-            }`}
-          >
-            Daily
-          </button>
-          <button
-            onClick={() => setTimeFilter("monthly")}
-            className={`px-3 py-1 rounded-full font-semibold transition ${
-              timeFilter === "monthly"
-                ? "bg-blue-600 text-white"
-                : "bg-white text-blue-600 border"
-            }`}
-          >
-            Monthly
-          </button>
-        </div>
+      {/* Search + Filter */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-2 mb-4">
+        <input
+          type="text"
+          placeholder="🔍 Search by name"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="p-2 border rounded w-full sm:w-1/2"
+        />
+        <select
+          value={topN}
+          onChange={(e) => setTopN(e.target.value)}
+          className="p-2 border rounded w-full sm:w-40 shadow-sm bg-white text-black"
+        >
+          <option value="all">Show All</option>
+          <option value="5">Top 5</option>
+          <option value="10">Top 10</option>
+        </select>
+      </div>
 
-        {/* Search + Filter */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-2 mb-4">
-          <input
-            type="text"
-            placeholder="🔍 Search by name"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="p-2 border rounded w-full sm:w-1/2"
-          />
-          <select
-            value={topN}
-            onChange={(e) => setTopN(e.target.value)}
-            className="p-2 border rounded w-full sm:w-40 shadow-sm bg-white text-black"
-          >
-            <option value="all">Show All</option>
-            <option value="5">Top 5</option>
-            <option value="10">Top 10</option>
-          </select>
-        </div>
-
-        {/* Table */}
-        <div className="overflow-x-auto bg-white rounded-lg">
-          <table className="w-full min-w-[400px] table-auto text-left border-t border-gray-200">
-            <thead className="bg-white text-black">
-              <tr className="text-gray-600 border-b">
-                <th className="py-2">Rank</th>
-                <th className="py-2">Name</th>
-                <th className="py-2 text-right">Points</th>
-                <th className="py-2 text-center">Edit</th>
+      {/* Table */}
+      <div className="overflow-x-auto rounded-lg">
+        <table className="w-full min-w-[400px] table-auto text-left border-t border-gray-200">
+          <thead className="bg-white text-black">
+            <tr className="text-gray-600 border-b">
+              <th className="py-2">Rank</th>
+              <th className="py-2">Name</th>
+              <th className="py-2 text-right">Points</th>
+              <th className="py-2 text-center">Edit</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredLeaderboard.map((user) => (
+              <tr
+                key={user._id}
+                className={`border-b transition-all duration-300 ${
+                  user._id === selectedUserId
+                    ? "bg-yellow-200 text-black font-semibold"
+                    : ""
+                }`}
+              >
+                <td className="py-2 w-12 text-center">{user.rank ?? "-"}</td>
+                <td className="py-2 flex items-center gap-2">
+                  {user.avatarUrl ? (
+                    <img
+                      src={user.avatarUrl}
+                      alt={user.name}
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                      {getInitials(user.name || "")}
+                    </div>
+                  )}
+                  <span className="ml-2">{user.name || "Unknown"}</span>
+                </td>
+                <td className="py-2 text-right">{user.totalPoints ?? 0}</td>
+                <td className="py-2 text-center">
+                  <button
+                    onClick={() => handleEdit(user)}
+                    className="text-blue-600 hover:underline text-sm"
+                  >
+                    Edit
+                  </button>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {filteredLeaderboard.map((user) => (
-                <tr
-                  key={user._id}
-                  className={`border-b transition-all duration-300 ${
-                    user._id === selectedUserId
-                      ? "bg-yellow-200 text-black font-semibold"
-                      : ""
-                  }`}
-                >
-                  <td className="py-2 w-12 text-center">{user.rank ?? "-"}</td>
-                  <td className="py-2 flex items-center gap-2">
-                    {user.avatarUrl ? (
-                      <img
-                        src={user.avatarUrl}
-                        alt={user.name}
-                        className="w-8 h-8 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                        {getInitials(user.name || "")}
-                      </div>
-                    )}
-                    <span className="ml-2">{user.name || "Unknown"}</span>
-                  </td>
-                  <td className="py-2 text-right">{user.totalPoints ?? 0}</td>
-                  <td className="py-2 text-center">
-                    <button
-                      onClick={() => handleEdit(user)}
-                      className="text-blue-600 hover:underline text-sm"
-                    >
-                      Edit
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+            ))}
+          </tbody>
+        </table>
       </div>
     </MotionDiv>
   );

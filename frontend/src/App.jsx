@@ -33,7 +33,7 @@ function App() {
   }, [refresh]);
 
   return (
-    <div className="relative min-h-screen bg-transparent overflow-hidden">
+    <div className="relative min-h-screen bg-gradient-to-r from-yellow-300 via-yellow-400 to-yellow-300 bg-stripes overflow-hidden">
       <BackgroundDecorations />
       <FloatingGiftIcon />
 
