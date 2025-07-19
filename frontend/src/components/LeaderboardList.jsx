@@ -98,7 +98,7 @@ function LeaderboardList({ refresh, selectedUserId, variant, setLeaderboardData,
       {/* Table */}
       <div className="overflow-x-auto bg-white rounded-lg">
         <table className="w-full min-w-[400px] table-auto text-left border-t border-gray-200">
-          <thead classname="bg-white text-black">
+          <thead className="bg-white text-black">
             <tr className="text-gray-600 border-b">
               <th className="py-2">Rank</th>
               <th className="py-2">Name</th>
@@ -106,7 +106,7 @@ function LeaderboardList({ refresh, selectedUserId, variant, setLeaderboardData,
               <th className="py-2 text-center">Edit</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody className="bg-white text-black">
             {filteredLeaderboard.map((user) => (
               <tr
                 key={user._id}
