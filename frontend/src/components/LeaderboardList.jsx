@@ -85,7 +85,7 @@ function LeaderboardList({ refresh, selectedUserId, variant, setLeaderboardData,
         <select
           value={topN}
           onChange={(e) => setTopN(e.target.value)}
-          className="p-2 border rounded w-full sm:w-40"
+          className="p-2 border rounded w-full sm:w-40 shadow-sm bg-white text-black"
         >
           <option value="all">Show All</option>
           <option value="5">Top 5</option>
@@ -110,7 +110,7 @@ function LeaderboardList({ refresh, selectedUserId, variant, setLeaderboardData,
                 key={user._id}
                 className={`border-b transition-all duration-300 ${
                   user._id === selectedUserId
-                    ? "bg-yellow-100 font-semibold"
+                    ? "bg-yellow-200 text-black font-semibold"
                     : ""
                 }`}
               >
@@ -129,6 +129,7 @@ function LeaderboardList({ refresh, selectedUserId, variant, setLeaderboardData,
                       {getInitials(user.name)}
                     </div>
                   )}
+                  <span className="ml-2">{user.name}</span>
                 </td>
                 <td className="py-2 text-right">{user.totalPoints}</td>
                  <td className="py-2 text-center">
