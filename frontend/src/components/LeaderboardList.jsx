@@ -105,7 +105,7 @@ function LeaderboardList({ refresh, selectedUserId, variant, setLeaderboardData,
             </tr>
           </thead>
           <tbody>
-            {filteredLeaderboard.map((user, index) => (
+            {filteredLeaderboard.map((user) => (
               <tr
                 key={user._id}
                 className={`border-b transition-all duration-300 ${
@@ -115,7 +115,7 @@ function LeaderboardList({ refresh, selectedUserId, variant, setLeaderboardData,
                 }`}
               >
                 <td className="py-2 w-12 text-center">
-                  {index + 4}
+                  {user.rank}
                 </td>
                 <td className="py-2 flex items-center gap-2">
                   {user.avatarUrl ? (

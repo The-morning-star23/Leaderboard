@@ -4,6 +4,7 @@ const User = require('../models/User');
 const avatarUpload = require("../middleware/upload");
 const fs = require("fs");
 const path = require("path");
+const History = require('../models/History');
 
 // Get all users
 router.get('/', async (req, res) => {
@@ -34,15 +35,65 @@ router.post('/', avatarUpload.single("avatar"), async (req, res) => {
 
 // Get leaderboard (sorted by points)
 router.get('/leaderboard', async (req, res) => {
+  const { period } = req.query;
+
+  let startDate;
+  if (period === "daily") {
+    startDate = new Date();
+    startDate.setHours(0, 0, 0, 0);
+  } else if (period === "monthly") {
+    startDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  }
+
   try {
-    const users = await User.find().sort({ totalPoints: -1 });
-    const leaderboard = users.map((user, index) => ({
-      _id: user._id,
-      rank: index + 1,
-      name: user.name,
-      totalPoints: user.totalPoints,
-      avatarUrl: user.avatarUrl || null,
-    }));
+    const users = await User.find();
+    let leaderboard;
+
+    if (startDate) {
+      // Aggregate from History model
+      const history = await History.aggregate([
+        {
+          $match: {
+            createdAt: { $gte: startDate }
+          }
+        },
+        {
+          $group: {
+            _id: "$user",
+            totalPoints: { $sum: "$points" }
+          }
+        },
+        {
+          $sort: { totalPoints: -1 }
+        }
+      ]);
+
+      // Map user IDs back to user data
+      const userMap = await User.find({
+        _id: { $in: history.map(h => h._id) }
+      }).lean();
+
+      const userMapObj = Object.fromEntries(userMap.map(u => [u._id.toString(), u]));
+
+      leaderboard = history.map((entry, idx) => ({
+        _id: entry._id,
+        rank: idx + 1,
+        name: userMapObj[entry._id.toString()]?.name || "Unknown",
+        avatarUrl: userMapObj[entry._id.toString()]?.avatarUrl || null,
+        totalPoints: entry.totalPoints
+      }));
+    } else {
+      leaderboard = users
+        .sort((a, b) => b.totalPoints - a.totalPoints)
+        .map((user, idx) => ({
+          _id: user._id,
+          rank: idx + 1,
+          name: user.name,
+          totalPoints: user.totalPoints,
+          avatarUrl: user.avatarUrl || null
+        }));
+    }
+
     res.json(leaderboard);
   } catch (err) {
     res.status(500).json({ message: err.message });
