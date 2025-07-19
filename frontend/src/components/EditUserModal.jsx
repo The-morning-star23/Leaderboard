@@ -63,18 +63,22 @@ function EditUserModal({ user, onClose, onSuccess }) {
             className="w-full p-2 border rounded"
           />
 
-          <input
-            type="file"
-            accept="image/*"
-            onChange={(e) => {
-              const file = e.target.files[0];
-              setAvatarFile(file);
-              if (file) {
-                setPreview(URL.createObjectURL(file));
-              }
-            }}
-            className="w-full text-sm"
-          />
+          {/* Modern avatar upload button */}
+          <label className="relative cursor-pointer bg-white border px-3 py-2 rounded shadow-sm hover:bg-gray-50 transition text-sm text-gray-700 inline-block">
+            📷 Upload New Avatar
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files[0];
+                setAvatarFile(file);
+                if (file) {
+                  setPreview(URL.createObjectURL(file));
+                }
+              }}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            />
+          </label>
 
           {preview && (
             <div className="flex justify-center mt-2">

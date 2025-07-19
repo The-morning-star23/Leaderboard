@@ -53,21 +53,27 @@ function AddUserForm({ onSuccess }) {
         onChange={(e) => setName(e.target.value)}
         className="p-2 border rounded w-full sm:w-auto"
       />
-      <input
-        type="file"
-        accept="image/png, image/jpeg, image/jpg"
-        onChange={(e) => setAvatarFile(e.target.files[0])}
-        className="text-sm"
-      />
+
+      <label className="relative cursor-pointer bg-white text-sm border px-3 py-2 rounded shadow hover:bg-gray-50 transition text-gray-700">
+        📷 Upload Avatar
+        <input
+          type="file"
+          accept="image/png, image/jpeg, image/jpg"
+          onChange={(e) => setAvatarFile(e.target.files[0])}
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+        />
+      </label>
+
       {avatarFile && (
-        <div className="mt-2">
+        <div className="mt-2 sm:mt-0">
           <img
             src={URL.createObjectURL(avatarFile)}
             alt="Avatar Preview"
-            className="w-16 h-16 rounded-full object-cover border"
+            className="w-10 h-10 rounded-full object-cover border"
           />
         </div>
       )}
+
       <button
         type="submit"
         disabled={loading}
