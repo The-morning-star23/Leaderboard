@@ -1,4 +1,4 @@
-// Root component: handles user interactions and renders leaderboard and claim features
+// Root component: handles user interactions and renders 
 import { useEffect, useState } from "react";
 import api from "./api";
 import BackgroundDecorations from "./components/BackgroundDecorations";
@@ -15,12 +15,11 @@ function App() {
   const [users, setUsers] = useState([]);
   const [selectedUserId, setSelectedUserId] = useState("");
   const [claimedPoints, setClaimedPoints] = useState(null);
-  const [refresh, setRefresh] = useState(false); // used to trigger re-fetch
-  const [selectedTab, setSelectedTab] = useState("hourly"); // default tab
+  const [refresh, setRefresh] = useState(false);
+  const [selectedTab, setSelectedTab] = useState("hourly");
   const [leaderboardData, setLeaderboardData] = useState([]);
-  const [editingUser, setEditingUser] = useState(null); // null or user object
+  const [editingUser, setEditingUser] = useState(null);
 
-  // Fetch users on mount or refresh
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -34,13 +33,17 @@ function App() {
   }, [refresh]);
 
   return (
-    <>
-      <FloatingGiftIcon />
+    <div className="relative min-h-screen bg-yellow-50 overflow-hidden">
       <BackgroundDecorations />
-      <div className="min-h-screen bg-transparent text-gray-800 p-4 relative z-10">
-        <h1 className="text-3xl font-bold mb-4 text-center">🏆 Leaderboard</h1>
-      
-        {/* User selection, claiming points, and adding new user */}
+      <FloatingGiftIcon />
+
+      {/* Main content area */}
+      <div className="relative z-10 p-4">
+        <h1 className="text-3xl font-bold mb-4 text-center text-yellow-800 drop-shadow">
+          🏆 Leaderboard
+        </h1>
+
+        {/* User actions */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
           <UserDropdown
             users={users}
@@ -55,13 +58,13 @@ function App() {
           <AddUserForm onSuccess={() => setRefresh(!refresh)} />
         </div>
 
-        {/* Show last claimed points */}
         {claimedPoints && (
           <div className="text-center text-green-600 font-medium mb-4">
             🎉 Claimed {claimedPoints} points!
           </div>
         )}
-        {/* Tabs Navigation */}
+
+        {/* Tabs */}
         <div className="flex justify-center mb-6">
           <div className="bg-white shadow rounded-full flex overflow-x-auto sm:overflow-visible px-2 whitespace-nowrap max-w-full sm:max-w-none">
             {["Party", "Live", "Hourly", "Family", "Wealth"].map((label) => (
@@ -82,9 +85,9 @@ function App() {
             ))}
           </div>
         </div>
-        
+
         <Top3Podium topThree={leaderboardData.slice(0, 3)} />
-        {/* Leaderboard and claim history */}
+
         <LeaderboardList
           refresh={refresh}
           selectedUserId={selectedUserId}
@@ -92,6 +95,7 @@ function App() {
           setLeaderboardData={setLeaderboardData}
           onEditUser={(user) => setEditingUser(user)}
         />
+
         {editingUser && (
           <EditUserModal
             user={editingUser}
@@ -99,9 +103,10 @@ function App() {
             onSuccess={() => setRefresh((prev) => !prev)}
           />
         )}
+
         <ClaimHistory refresh={refresh} />
       </div>
-    </>
+    </div>
   );
 }
 
