@@ -40,6 +40,16 @@
   }
 }
 
+.bg-stripes {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(255,255,255,0.1) 0,
+    rgba(255,255,255,0.1) 10px,
+    transparent 10px,
+    transparent 20px
+  );
+}
+
 /* Ribbon Animation */
 @keyframes ribbon-float {
   0% {
