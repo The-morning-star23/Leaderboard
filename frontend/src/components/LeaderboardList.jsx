@@ -29,10 +29,14 @@ function LeaderboardList({ refresh, selectedUserId, variant, setLeaderboardData,
     onEditUser(user);
   };
 
-  // Show all users if 3 or fewer, else skip top 3
- const filteredLeaderboard = leaderboard
-  .filter((user, idx) => idx >= 3 && user.name?.toLowerCase().includes(searchQuery.toLowerCase()))
-  .slice(0, topN === "all" ? leaderboard.length : Number(topN));
+  // Skip top 3 only if leaderboard is longer than 3
+  const filteredLeaderboard = leaderboard
+    .filter((user, idx) => {
+      const isBelowTop3 = leaderboard.length > 3 ? idx >= 3 : true;
+      const matchesSearch = user.name?.toLowerCase().includes(searchQuery.toLowerCase());
+      return isBelowTop3 && matchesSearch;
+    })
+    .slice(0, topN === "all" ? leaderboard.length : Number(topN));
 
   return (
     <MotionDiv
@@ -51,6 +55,7 @@ function LeaderboardList({ refresh, selectedUserId, variant, setLeaderboardData,
         {variant.charAt(0).toUpperCase() + variant.slice(1)} Ranking
       </h2>
 
+      {/* Time Filter */}
       <div className="flex justify-center gap-4 mb-4">
         <button
           onClick={() => setTimeFilter("daily")}
