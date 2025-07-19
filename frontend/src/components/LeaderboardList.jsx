@@ -24,14 +24,16 @@ function LeaderboardList({ refresh, selectedUserId, variant, setLeaderboardData,
     };
     fetchLeaderboard();
   }, [refresh, setLeaderboardData, timeFilter]);
-
+  
   const handleEdit = (user) => {
     onEditUser(user);
   };
 
   const filteredLeaderboard = leaderboard
-    .filter((user) => user.name.toLowerCase().includes(searchQuery.toLowerCase()))
-    .slice(3, topN === "all" ? undefined : 3 + Number(topN)); // skip top 3, then limit
+  .filter((user) =>
+    user.name.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+  .slice(topN === "all" ? 3 : 3, topN === "all" ? leaderboard.length : Number(topN));
 
   return (
     <MotionDiv
@@ -106,10 +108,14 @@ function LeaderboardList({ refresh, selectedUserId, variant, setLeaderboardData,
               <tr
                 key={user._id}
                 className={`border-b transition-all duration-300 ${
-                  user._id === selectedUserId ? "bg-yellow-200 text-black font-semibold" : ""
+                  user._id === selectedUserId
+                    ? "bg-yellow-200 text-black font-semibold"
+                    : ""
                 }`}
               >
-                <td className="py-2 w-12 text-center">{user.rank}</td>
+                <td className="py-2 w-12 text-center">
+                  {user.rank}
+                </td>
                 <td className="py-2 flex items-center gap-2">
                   {user.avatarUrl ? (
                     <img
@@ -125,7 +131,7 @@ function LeaderboardList({ refresh, selectedUserId, variant, setLeaderboardData,
                   <span className="ml-2">{user.name}</span>
                 </td>
                 <td className="py-2 text-right">{user.totalPoints}</td>
-                <td className="py-2 text-center">
+                 <td className="py-2 text-center">
                   <button
                     onClick={() => handleEdit(user)}
                     className="text-blue-600 hover:underline text-sm"
@@ -144,7 +150,7 @@ function LeaderboardList({ refresh, selectedUserId, variant, setLeaderboardData,
 
 LeaderboardList.propTypes = {
   refresh: PropTypes.bool.isRequired,
-  selectedUserId: PropTypes.string.isRequired,
+  selectedUserId: PropTypes.string.isRequired,  
   setLeaderboardData: PropTypes.func.isRequired,
   variant: PropTypes.oneOf(["hourly", "live", "wealth"]).isRequired,
   onEditUser: PropTypes.func.isRequired,
