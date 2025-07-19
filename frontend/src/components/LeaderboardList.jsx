@@ -30,12 +30,9 @@ function LeaderboardList({ refresh, selectedUserId, variant, setLeaderboardData,
   };
 
   // Show all users if 3 or fewer, else skip top 3
-  const filteredLeaderboard = leaderboard
-  .filter((user) => user.rank > 3)
-  .filter((user) =>
-    user.name.toLowerCase().includes(searchQuery.toLowerCase())
-  )
-  .slice(0, topN === "all" ? leaderboard.length : Number(topN) - 3)
+ const filteredLeaderboard = leaderboard
+  .filter((user, idx) => idx >= 3 && user.name?.toLowerCase().includes(searchQuery.toLowerCase()))
+  .slice(0, topN === "all" ? leaderboard.length : Number(topN));
 
   return (
     <MotionDiv
