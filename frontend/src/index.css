@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-  @apply bg-[#fdf6e3] text-gray-800;
+  @apply bg-[#fff8dc] text-gray-800;
   background-image: repeating-linear-gradient(
     45deg,
     rgba(255, 255, 255, 0.2) 0,
