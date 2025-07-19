@@ -40,7 +40,7 @@ function BackgroundDecorations() {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 -z-10 pointer-events-none overflow-hidden bg-gradient-to-b from-yellow-300 via-yellow-400 to-yellow-300 bg-stripes"
+      className="fixed inset-0 -z-10 pointer-events-none overflow-hiddenbg-gradient-to-r from-yellow-400 to-yellow-300 bg-stripes"
     />
   );
 }

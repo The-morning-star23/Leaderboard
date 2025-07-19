@@ -44,7 +44,7 @@ function LeaderboardList({ refresh, selectedUserId, variant, setLeaderboardData,
         variant === "hourly"
           ? "bg-yellow-50 text-black"
           : variant === "live"
-          ? "bg-gradient-to-r from-yellow-400 to-yellow-300 text-black"
+          ? "bg-yellow-50 text-black"
           : variant === "wealth"
           ? "bg-yellow-50 text-black"
           : "bg-white text-black"
