@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const History = require('../models/History');
 const avatarUpload = require("../middleware/upload");
 const fs = require("fs");
 const path = require("path");
-const History = require('../models/History');
 
 // Get all users
 router.get('/', async (req, res) => {
@@ -22,9 +22,9 @@ router.post('/', avatarUpload.single("avatar"), async (req, res) => {
   if (!name) return res.status(400).json({ message: 'Name is required' });
 
   try {
-    const newUser = new User({ 
+    const newUser = new User({
       name,
-      avatarUrl: req.file ? `/uploads/avatars/${req.file.filename}` : undefined, 
+      avatarUrl: req.file ? `/uploads/avatars/${req.file.filename}` : undefined,
     });
     await newUser.save();
     res.status(201).json(newUser);
@@ -33,11 +33,11 @@ router.post('/', avatarUpload.single("avatar"), async (req, res) => {
   }
 });
 
-// Get leaderboard (sorted by points)
+// Get leaderboard (supports daily/monthly/overall)
 router.get('/leaderboard', async (req, res) => {
   const { period } = req.query;
 
-  let startDate;
+  let startDate = null;
   if (period === "daily") {
     startDate = new Date();
     startDate.setHours(0, 0, 0, 0);
@@ -46,52 +46,37 @@ router.get('/leaderboard', async (req, res) => {
   }
 
   try {
-    const users = await User.find();
-    let leaderboard;
+    let leaderboard = [];
 
     if (startDate) {
-      // Aggregate from History model
+      // Dynamic: use History to aggregate for the period
       const history = await History.aggregate([
-        {
-          $match: {
-            createdAt: { $gte: startDate }
-          }
-        },
-        {
-          $group: {
-            _id: "$user",
-            totalPoints: { $sum: "$points" }
-          }
-        },
-        {
-          $sort: { totalPoints: -1 }
-        }
+        { $match: { createdAt: { $gte: startDate } } },
+        { $group: { _id: "$user", totalPoints: { $sum: "$points" } } },
+        { $sort: { totalPoints: -1 } }
       ]);
 
-      // Map user IDs back to user data
-      const userMap = await User.find({
-        _id: { $in: history.map(h => h._id) }
-      }).lean();
-
-      const userMapObj = Object.fromEntries(userMap.map(u => [u._id.toString(), u]));
+      const userIds = history.map(h => h._id);
+      const userData = await User.find({ _id: { $in: userIds } }).lean();
+      const userMap = Object.fromEntries(userData.map(u => [u._id.toString(), u]));
 
       leaderboard = history.map((entry, idx) => ({
         _id: entry._id,
         rank: idx + 1,
-        name: userMapObj[entry._id.toString()]?.name || "Unknown",
-        avatarUrl: userMapObj[entry._id.toString()]?.avatarUrl || null,
+        name: userMap[entry._id.toString()]?.name || "Unknown",
+        avatarUrl: userMap[entry._id.toString()]?.avatarUrl || null,
         totalPoints: entry.totalPoints
       }));
     } else {
-      leaderboard = users
-        .sort((a, b) => b.totalPoints - a.totalPoints)
-        .map((user, idx) => ({
-          _id: user._id,
-          rank: idx + 1,
-          name: user.name,
-          totalPoints: user.totalPoints,
-          avatarUrl: user.avatarUrl || null
-        }));
+      // Default: overall leaderboard using User.totalPoints
+      const users = await User.find().sort({ totalPoints: -1 });
+      leaderboard = users.map((user, idx) => ({
+        _id: user._id,
+        rank: idx + 1,
+        name: user.name,
+        avatarUrl: user.avatarUrl || null,
+        totalPoints: user.totalPoints
+      }));
     }
 
     res.json(leaderboard);
@@ -100,12 +85,12 @@ router.get('/leaderboard', async (req, res) => {
   }
 });
 
+// Update user (name and/or avatar)
 router.patch("/:id", avatarUpload.single("avatar"), async (req, res) => {
   try {
     const { name } = req.body;
     const userId = req.params.id;
 
-    // Fetch existing user to get old avatar
     const existingUser = await User.findById(userId);
     if (!existingUser) {
       return res.status(404).json({ message: "User not found" });
@@ -115,26 +100,22 @@ router.patch("/:id", avatarUpload.single("avatar"), async (req, res) => {
     if (name) updateFields.name = name;
 
     if (req.file) {
-      // Delete old avatar if it exists
+      // Delete old avatar file if exists
       if (existingUser.avatarUrl) {
         const oldAvatarPath = path.join(__dirname, "..", existingUser.avatarUrl);
         fs.unlink(oldAvatarPath, (err) => {
-          if (err) {
-            console.warn("Old avatar delete failed:", err.message);
-          }
+          if (err) console.warn("Failed to delete old avatar:", err.message);
         });
       }
       updateFields.avatarUrl = `/uploads/avatars/${req.file.filename}`;
     }
 
-    const updatedUser = await User.findByIdAndUpdate(userId, updateFields, {
-      new: true,
-    });
-
+    const updatedUser = await User.findByIdAndUpdate(userId, updateFields, { new: true });
     res.json(updatedUser);
   } catch (err) {
     console.error("Error updating user:", err);
     res.status(500).json({ message: "Server error" });
   }
 });
+
 module.exports = router;

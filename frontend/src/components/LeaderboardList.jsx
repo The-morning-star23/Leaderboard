@@ -30,11 +30,10 @@ function LeaderboardList({ refresh, selectedUserId, variant, setLeaderboardData,
   };
 
   const filteredLeaderboard = leaderboard
-    .slice(3)
-    .filter((user) =>
-      user.name.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-    .slice(0, topN === "all" ? leaderboard.length : Number(topN));
+  .filter((user) =>
+    user.name.toLowerCase().includes(searchQuery.toLowerCase())
+  )
+  .slice(topN === "all" ? 3 : 3, topN === "all" ? leaderboard.length : Number(topN));
 
   return (
     <MotionDiv
